@@ -70,21 +70,28 @@ uint64_t getChunk(const std::vector<uint64_t>& bitseq, const size_t realSize, si
 void chunkRadixSortSuffixesInPlace(const std::vector<uint64_t>& bitseq, const size_t realSize, std::vector<std::pair<size_t, uint64_t>>& positions, size_t offset, const size_t vecStart, const size_t vecEnd)
 {
 	if (vecEnd - vecStart < 2) return;
+	const size_t posMask = ((size_t)1 << (size_t)61) - (size_t)1;
 	for (size_t i = vecStart; i < vecEnd; i++)
 	{
-		positions[i].second = getChunk(bitseq, realSize, positions[i].first+offset);
+		positions[i].second = getChunk(bitseq, realSize, (positions[i].first & posMask) + offset);
 	}
 	std::sort(positions.begin()+vecStart, positions.begin()+vecEnd, [](std::pair<size_t, uint64_t> left, std::pair<size_t, uint64_t> right) { return left.second < right.second; });
 	size_t start = vecStart;
+	uint8_t uniquePrefixChar = positions[vecStart].first >> 61;
 	for (size_t i = vecStart+1; i < vecEnd; i++)
 	{
 		if (positions[i].second != positions[i-1].second)
 		{
-			if (i > start+1) chunkRadixSortSuffixesInPlace(bitseq, realSize, positions, offset+21, start, i);
+			if (i > start+1 && uniquePrefixChar == 7) chunkRadixSortSuffixesInPlace(bitseq, realSize, positions, offset+21, start, i);
 			start = i;
+			uniquePrefixChar = positions[i].first >> 61;
+		}
+		else if (positions[i].first >> 61 != uniquePrefixChar)
+		{
+			uniquePrefixChar = 7;
 		}
 	}
-	if (start != vecEnd-1)
+	if (start != vecEnd-1 && uniquePrefixChar == 7)
 	{
 		chunkRadixSortSuffixesInPlace(bitseq, realSize, positions, offset+21, start, vecEnd);
 	}
@@ -93,44 +100,45 @@ void chunkRadixSortSuffixesInPlace(const std::vector<uint64_t>& bitseq, const si
 size_t sortSuffixesWithPrefix(const std::vector<uint64_t>& bitseq, const size_t realSize, std::string& bwt, const uint64_t refPrefix, const size_t suffixCount, const size_t doneAlready, std::vector<std::pair<size_t, uint64_t>>& positions)
 {
 	assert(positions.capacity() >= suffixCount);
+	const size_t posMask = ((size_t)1 << (size_t)61) - 1;
 	iteratePrefixSuffixes<PREFIX_LENGTH>(bitseq, realSize, [refPrefix, &positions, &bitseq, realSize](uint64_t prefix, size_t pos)
 	{
 		if (prefix != refPrefix) return;
+		uint8_t charBefore = 0;
+		if (pos > 0) charBefore = getChar(bitseq, realSize, pos-1);
+		assert(charBefore < 8);
+		assert(pos < (size_t)1 << (size_t)61);
 		uint64_t suffixPrefix = getChunk(bitseq, realSize, pos+PREFIX_LENGTH);
-		positions.emplace_back(pos, suffixPrefix);
+		positions.emplace_back(pos + ((size_t)charBefore << (size_t)61), suffixPrefix);
 	});
 	std::sort(positions.begin(), positions.end(), [](std::pair<size_t, uint64_t> left, std::pair<size_t, uint64_t> right) { return left.second < right.second; });
 	size_t start = 0;
+	uint8_t uniquePrefixChar = positions[0].first >> 61;
 	for (size_t i = 1; i < positions.size(); i++)
 	{
 		if (positions[i].second != positions[i-1].second)
 		{
-			if (i > start+1)
+			if (i > start+1 && uniquePrefixChar == 7)
 			{
 				chunkRadixSortSuffixesInPlace(bitseq, realSize, positions, PREFIX_LENGTH+21, start, i);
 			}
 			start = i;
+			uniquePrefixChar = positions[i].first >> 61;
+		}
+		else if ((positions[i].first >> 61) != uniquePrefixChar)
+		{
+			uniquePrefixChar = 7;
 		}
 	}
-	if (start < positions.size()-1)
+	if (start < positions.size()-1 && uniquePrefixChar == 7)
 	{
 		chunkRadixSortSuffixesInPlace(bitseq, realSize, positions, PREFIX_LENGTH+21, start, positions.size());
 	}
 	assert(doneAlready + positions.size() <= bwt.size());
 	for (size_t i = 0; i < positions.size(); i++)
 	{
-		assert(positions[i].first < realSize);
-		size_t pos = 0;
-		if (positions[i].first == 0)
-		{
-			pos = realSize-1;
-		}
-		else
-		{
-			pos = positions[i].first-1;
-		}
 		assert(bwt[doneAlready+i] == 7);
-		bwt[doneAlready+i] = getChar(bitseq, realSize, pos);
+		bwt[doneAlready+i] = positions[i].first >> 61;
 	}
 	return positions.size();
 }
