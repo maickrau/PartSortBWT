@@ -26,4 +26,4 @@ Measured with `/usr/bin/time -v bin/main input_file > /dev/null` using commit [1
 
 Classify suffixes according to their first 4 characters. First collect and sort all suffixes starting with AAAA to get the first x characters of the BWT, then suffixes with AAAC to get the next y characters, etc. Repeat for all 4-character prefixes.
 
-Expected memory use for a random DNA string is `input + output + ~0.875n` bytes. If input == output then total memory use is ~1.875n bytes. Theoretical runtime is `O(n^2 log n)`.
+Expected memory use for a random DNA string is `input + output + ~0.875n` bytes. If input == output then total memory use is ~1.875n bytes. Less random strings have higher memory use and worst case is one character repeating (eg `NNNNNNNN...`) using ~128n bytes. Expected runtime for a random string is `O(n log^2 n)` and worst case is `O(n^2 log n)`.
