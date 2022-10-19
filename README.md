@@ -21,6 +21,8 @@ Measured with `/usr/bin/time -v bin/main input_file > /dev/null` using commit [1
 | CHM13 hpc | 2.1 Gbp | 0:11:35 | 3.6 Gb |
 | CHM13 | 3.1 Gbp | 0:30:03 | 4.9 Gb |
 | Assembly graph hpc | 3.8 Gbp | 0:37:26 | 6.5 Gb |
+| AAAAAA... | 1 Mbp | 0:14:49 | 19 Mb |
+| GRCh38 | 3.3 Gbp | out of memory crash | >12 Gb |
 
 ### Method
 
