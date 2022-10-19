@@ -9,7 +9,7 @@ PartSortBWT(input, output); // computes BWT, stores in output
 PartSortBWT(input, input); // computes BWT, stores in the same string and overwrites
 ```
 
-The input and output can be the same string. For a real example see [src/main.cpp](src/main.cpp). The input string must end with 0, and all other characters must be between 1-5 representing the alphabet `$NACGT`.
+The input and output can be the same string. For a real example see [src/main.cpp](src/main.cpp). The input string must end with 0, and all other characters must be between 1-5 representing the alphabet `$NACGT`. Not recommended for strings which have long runs of N's, eg. GRCh38.
 
 ### Benchmark
 
