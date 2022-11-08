@@ -1,8 +1,10 @@
+#include <cassert>
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include "PartSortBWT.h"
+#include "InducedPartSortBWT.h"
 
 // usage: bin/main input_string_file > output_bwt_file
 // computes BWT of the first line of input_string_file
@@ -36,10 +38,10 @@ int main(int argc, char** argv)
 	}
 	seq.push_back(0);
 	std::cerr << "size " << seq.size() << std::endl;
-	partSortBWT(seq, seq);
+	inducedPartSortBWT(seq, seq);
 	for (size_t i = 0; i < seq.size(); i++)
 	{
-		std::cout << "$_ACGT"[seq[i]];
+		std::cout << "$NACGT"[seq[i]];
 	}
 	std::cout << std::endl;
 }
