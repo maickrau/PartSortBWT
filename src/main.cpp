@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 #include "PartSortBWT.h"
-#include "InducedPartSortBWT.h"
 
 // usage: bin/main input_string_file > output_bwt_file
 // computes BWT of the first line of input_string_file
