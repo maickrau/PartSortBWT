@@ -6,8 +6,8 @@
 
 const size_t PREFIX_LENGTH = 4;
 const size_t ALPHABET_SIZE = 8;
-constexpr size_t MAX_PREFIX = pow(ALPHABET_SIZE, PREFIX_LENGTH);
-constexpr uint64_t MASK = MAX_PREFIX-1;
+const size_t MAX_PREFIX = pow(ALPHABET_SIZE, PREFIX_LENGTH);
+const uint64_t MASK = MAX_PREFIX-1;
 
 template <int length, typename F>
 void iteratePrefixSuffixes(const std::vector<uint64_t>& bitseq, const size_t realSize, F callback)
