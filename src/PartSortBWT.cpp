@@ -125,7 +125,6 @@ void chunkRadixSortSuffixesInPlaceNoEscape(const std::vector<uint64_t>& bitseq, 
 size_t sortSuffixesWithPrefix(const std::vector<uint64_t>& bitseq, const size_t realSize, std::string& bwt, const uint64_t refPrefix, const size_t suffixCount, const size_t doneAlready, std::vector<std::pair<size_t, uint64_t>>& positions)
 {
 	assert(positions.capacity() >= suffixCount);
-	const size_t posMask = ((size_t)1 << (size_t)61) - 1;
 	iteratePrefixSuffixes<PREFIX_LENGTH>(bitseq, realSize, [refPrefix, &positions, &bitseq, realSize](uint64_t prefix, size_t pos)
 	{
 		if (prefix != refPrefix) return;
@@ -302,7 +301,7 @@ void partSortBWT(std::string& result, const std::vector<uint64_t>& bitseq, const
 	std::vector<size_t> prefixCount;
 	prefixCount.resize(MAX_PREFIX, 0);
 	size_t counted = 0;
-	iteratePrefixSuffixes<PREFIX_LENGTH>(bitseq, realSize, [&counted, &prefixCount](uint64_t prefix, size_t pos)
+	iteratePrefixSuffixes<PREFIX_LENGTH>(bitseq, realSize, [&counted, &prefixCount](uint64_t prefix, size_t)
 	{
 		prefixCount[prefix] += 1;
 		counted += 1;
